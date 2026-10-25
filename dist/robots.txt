@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ash-it-consulting-enterprise.nuttyhake5.chatgpt.site/sitemap.xml
