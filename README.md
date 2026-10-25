@@ -12,4 +12,4 @@ Then open `http://127.0.0.1:4173`.
 
 ## Contact flow
 
-The inquiry form validates required fields and opens a pre-addressed email draft to `ashvak@ashitconsulting.ca`; no submitted form data is stored by the static site.
+The inquiry form validates required fields and opens a pre-addressed email draft to `info@ashitconsulting.ca`; no submitted form data is stored by the static site.
