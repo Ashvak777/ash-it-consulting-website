@@ -10,15 +10,15 @@ const TAU=Math.PI*2,clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),mix=(a,b,t)=>a+
 const ss=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0));return t*t*(3-2*t)};
 const rng=(s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296})(2020);
 
-const TYPES={email:['EMAIL','@','#8fb9ff'],crm:['CRM','◎','#94fff0'],form:['FORM','▤','#d2b9ff'],doc:['DOCUMENT','▦','#ffcf8f'],invoice:['INVOICE','$','#a6f3b5'],ticket:['TICKET','#','#ff9fb2']};
-const LANES=[['AUTO-RESOLVED','AUTO','#7ef0c4'],['ROUTED TO OWNER','ROUTE','#6aa8ff'],['HUMAN REVIEW','REVIEW','#ffc46b']];
-const ITEMS=[['email','RFQ: fleet renewal',1,'Procurement'],['invoice','Invoice #4471',0,'Finance'],['crm','New lead · Brampton',1,'Sales'],['form','Access request',0,'IT'],['doc','Supplier contract v3',2,'Legal'],['ticket','SLA breach risk',2,'Operations'],['email','Change of address',0,'Records'],['invoice','Credit memo #882',0,'Finance'],['form','Onboarding: 3 hires',1,'People'],['crm','Renewal at risk',1,'Accounts'],['doc','Policy exception',2,'Compliance'],['ticket','Password reset',0,'IT'],['email','Quote follow-up',0,'Sales'],['form','Site inspection',1,'Field ops'],['invoice','Duplicate payment?',2,'Finance'],['doc','Signed SOW',0,'Delivery'],['ticket','Laptop request',0,'IT'],['crm','Contact update',0,'Sales']];
+const TYPES={inbox:['INBOX','@','#8fb9ff'],crm:['CRM','◎','#94fff0'],forms:['FORMS','▤','#d2b9ff'],erp:['ERP','▦','#ffcf8f']};
+const LANES=[['APPROVE','APPROVE','#7ef0c4'],['NOTIFY','NOTIFY','#6aa8ff'],['RECORD','RECORD','#ffc46b']];
+const KINDS=['inbox','crm','forms','erp'],ROUTE=[1,0,0,2,0,1,0,2,1,0,0,2,1,0,0,2,1,0];
+const ITEMS=ROUTE.map((lane,i)=>[KINDS[i%4],'Business event',lane]);
 const N=ITEMS.length,ROWS=7;
-const cards=ITEMS.map(([type,label,lane,owner],i)=>({i,type,label,lane,owner,fx:rng(),fy:rng(),rot:(rng()-.5)*.5,depth:.55+rng()*.45,ph:rng()*TAU,sp:.6+rng()*.8}));
+const cards=ITEMS.map(([type,label,lane],i)=>({i,type,label,lane,fx:rng(),fy:rng(),rot:(rng()-.5)*.5,depth:.55+rng()*.45,ph:rng()*TAU,sp:.6+rng()*.8}));
 const laneOrder=[[],[],[]];cards.forEach(c=>{c.k=laneOrder[c.lane].length;laneOrder[c.lane].push(c)});
 // Rows of the governed queue: the first ROWS cards; the rest are absorbed into their lane's KPI.
 const chart=Array.from({length:26},(_,i)=>.25+i/25*.55+Math.sin(i*1.7)*.06+(rng()-.5)*.08);
-const KPI=[1148,312,47];
 
 let W=0,H=0,dpr=1,R,cw,ch,D,progress=0,shown=-1,running=false,visible=false;
 function layout(){
@@ -84,13 +84,13 @@ function drawCard(c,s){
   rr(ix,-ic/2,ic,ic,ic*.24);ctx.fillStyle=hexA(T[2],.16);ctx.fill();
   ctx.fillStyle=T[2];ctx.font=sans(700,ic*.5);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(T[1],ix+ic/2,1);
   ctx.textAlign='left';
-  const tx=ix+ic+h*.22,pillW=s.tag>.01?Math.max(36,h*1.05):0,avail=x+w-tx-pillW-h*.3;
+  const ph0=Math.min(h*.5,18);ctx.font=mono(Math.max(7,ph0*.48));const tx=ix+ic+h*.22,pillW=s.tag>.01?ctx.measureText(L[1]).width+ph0*1.1:0,avail=x+w-tx-pillW-h*.3;
   if(h>26&&!row){
     ctx.fillStyle='#7f98b4';ctx.font=mono(Math.max(7,h*.18));ctx.fillText(T[0],tx,-h*.16);
     ctx.fillStyle='#e9f3ff';ctx.font=sans(700,Math.max(9,h*.24));ctx.fillText(fit(c.label,avail),tx,h*.17);
   }else{
     ctx.fillStyle='#e9f3ff';ctx.font=sans(700,Math.max(8,h*.3));const lw=Math.min(avail*.62,ctx.measureText(c.label).width);ctx.fillText(fit(c.label,avail*.62),tx,1);
-    if(row&&avail>120){ctx.globalAlpha=s.al*s.k;ctx.fillStyle='#7f98b4';ctx.font=mono(Math.max(7,h*.24));ctx.fillText(fit(c.owner.toUpperCase(),avail*.36),tx+Math.max(lw+14,avail*.62),1);ctx.globalAlpha=s.al}
+    if(row&&avail>120){ctx.globalAlpha=s.al*s.k;ctx.fillStyle='#7f98b4';ctx.font=mono(Math.max(7,h*.24));ctx.fillText(T[0],tx+Math.max(lw+14,avail*.62),1);ctx.globalAlpha=s.al}
   }
   if(s.tag>.01){
     ctx.globalAlpha=s.al*s.tag;const pw=pillW,ph=Math.min(h*.5,18),px=x+w-pw-h*.24;
@@ -100,8 +100,11 @@ function drawCard(c,s){
   ctx.restore();
 }
 
+const t0=performance.now();
 function frame(p,t){
   ctx.clearRect(0,0,W,H);
+  const intro=ss(0,1600,t-t0),zc=1+.09*(1-ss(0,.12,p))+.06*Math.sin(Math.PI*ss(.06,.4,p));
+  ctx.save();ctx.translate(R.x+R.w/2,R.y+R.h/2);ctx.scale(zc,zc);ctx.translate(-(R.x+R.w/2),-(R.y+R.h/2));
   const a=ss(.08,.26,p),b=ss(.3,.48,p),k=ss(.64,.84,p),cx=R.x+R.w/2,cy=R.y+R.h/2,u=Math.min(R.w,R.h);
   // dot field
   ctx.fillStyle='rgba(122,190,255,.09)';const g=28;
@@ -115,8 +118,8 @@ function frame(p,t){
     ctx.setLineDash([]);
     if(a>0&&b<1){const ang=p*TAU*3.2-Math.PI/2,sw=ctx.createConicGradient?ctx.createConicGradient(ang-.7,0,0):null;
       if(sw){sw.addColorStop(0,'rgba(82,217,255,0)');sw.addColorStop(.11,'rgba(82,217,255,.22)');sw.addColorStop(.112,'rgba(82,217,255,0)');ctx.fillStyle=sw;ctx.beginPath();ctx.arc(0,0,u*.5,0,TAU);ctx.fill()}}
-    ctx.fillStyle='#e9f3ff';ctx.font=sans(800,Math.max(13,u*.04));ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b<.5?'AI':'POLICY',0,-u*.012);
-    ctx.fillStyle='#8fb9ff';ctx.font=mono(Math.max(8,u*.017));ctx.fillText(b<.5?`READING ${Math.round(N*ss(.14,.3,p))}/${N}`:'RULES · CONFIDENCE · OWNERS',0,u*.035);
+    ctx.fillStyle='#e9f3ff';ctx.font=sans(800,Math.max(13,u*.04));ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b<.5?'AI':'ROUTES',0,-u*.012);
+    ctx.fillStyle='#8fb9ff';ctx.font=mono(Math.max(8,u*.017));ctx.fillText(b<.5?'INTERPRETS':'POLICIES · DATA · CONFIDENCE RULES',0,u*.035);
     ctx.restore();
   }
   const states=cards.map(c=>cardState(c,p,t));
@@ -127,48 +130,48 @@ function frame(p,t){
   const laneA=b*(1-k);
   if(laneA>.01){ctx.save();ctx.globalAlpha=laneA;LANES.forEach((L,l)=>{const x=R.x+R.w*(.18+l*.32),cnt=laneOrder[l].length;
     ctx.fillStyle=L[2];ctx.font=mono(Math.max(8,u*.018));ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(L[0],x,R.y+R.h*.1);
-    ctx.fillStyle='#7f98b4';ctx.fillText(`${cnt} SIGNALS`,x,R.y+R.h*.1+Math.max(12,u*.03));
+    ctx.fillStyle='#7f98b4';ctx.fillText(`${cnt} EVENTS`,x,R.y+R.h*.1+Math.max(12,u*.03));
     ctx.strokeStyle=hexA(L[2],.35);ctx.beginPath();ctx.moveTo(x-cw*.45,R.y+R.h*.17);ctx.lineTo(x+cw*.45,R.y+R.h*.17);ctx.stroke()});ctx.restore()}
   // governed dashboard frame + contents (behind the rows)
   if(k>.01){
     ctx.save();ctx.globalAlpha=k;
     rr(D.x,D.y,D.w,D.h,16);ctx.fillStyle='rgba(13,31,53,.82)';ctx.fill();ctx.strokeStyle='rgba(145,202,255,.24)';ctx.stroke();
-    ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillStyle='#9fb5ce';ctx.font=mono(Math.max(8,u*.017));ctx.fillText('OPERATIONS OVERVIEW · ILLUSTRATIVE',D.x+D.p,D.y+D.hh*.62);
-    ctx.textAlign='right';ctx.fillStyle='#93fbd9';ctx.fillText('● GOVERNED',D.x+D.w-D.p,D.y+D.hh*.62);
+    ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillStyle='#9fb5ce';ctx.font=mono(Math.max(8,u*.017));ctx.fillText('OPERATIONAL SIGNAL',D.x+D.p,D.y+D.hh*.62);
+    ctx.textAlign='right';ctx.fillStyle='#93fbd9';ctx.fillText('● LIVE',D.x+D.w-D.p,D.y+D.hh*.62);
     ctx.strokeStyle='rgba(145,202,255,.12)';ctx.beginPath();ctx.moveTo(D.x,D.y+D.hh);ctx.lineTo(D.x+D.w,D.y+D.hh);ctx.stroke();
     D.kpi.forEach((q,l)=>{const L=LANES[l];rr(q.x,q.y,q.w,q.h,10);ctx.fillStyle='rgba(7,19,34,.55)';ctx.fill();ctx.strokeStyle=hexA(L[2],.28);ctx.stroke();
       ctx.textAlign='left';ctx.fillStyle=L[2];ctx.font=mono(Math.max(7,Math.min(q.h*.15,u*.017)));ctx.fillText(L[0],q.x+q.h*.2,q.y+q.h*.28);
-      ctx.fillStyle='#fff';ctx.font=sans(800,Math.max(14,Math.min(q.h*.36,q.w*.17)));ctx.fillText(Math.round(KPI[l]*ss(.68,.9,p)).toLocaleString('en-CA'),q.x+q.h*.2,q.y+q.h*.66)});
-    const Q=D.queue;ctx.textAlign='left';ctx.fillStyle='#7f98b4';ctx.font=mono(Math.max(7,u*.015));ctx.fillText('LIVE WORK QUEUE',Q.x,Q.y+D.rh*.45);ctx.textAlign='right';ctx.fillText('STATUS',Q.x+Q.w-4,Q.y+D.rh*.45);
+      ctx.fillStyle='#fff';ctx.font=sans(800,Math.max(14,Math.min(q.h*.36,q.w*.17)));ctx.fillText(Math.round(laneOrder[l].length*ss(.68,.9,p)),q.x+q.h*.2,q.y+q.h*.66)});
+    const Q=D.queue;ctx.textAlign='left';ctx.fillStyle='#7f98b4';ctx.font=mono(Math.max(7,u*.015));ctx.fillText('WORK MOVES FORWARD',Q.x,Q.y+D.rh*.45);ctx.textAlign='right';ctx.fillText('ACTION',Q.x+Q.w-4,Q.y+D.rh*.45);
     if(D.chart){const C=D.chart,cp=ss(.76,.97,p);rr(C.x,C.y,C.w,C.h,10);ctx.fillStyle='rgba(7,19,34,.55)';ctx.fill();ctx.strokeStyle='rgba(145,202,255,.14)';ctx.stroke();
-      ctx.textAlign='left';ctx.fillStyle='#7f98b4';ctx.font=mono(Math.max(7,u*.015));ctx.fillText('CYCLE TIME ↓',C.x+12,C.y+16);
+      ctx.textAlign='left';ctx.fillStyle='#7f98b4';ctx.font=mono(Math.max(7,u*.015));ctx.fillText('REPORT',C.x+12,C.y+16);
       const px=C.x+12,pw=C.w-24,py=C.y+28,ph=C.h-40,last=Math.max(1,Math.floor(cp*(chart.length-1)));
       ctx.beginPath();for(let i=0;i<=last;i++){const X=px+i/(chart.length-1)*pw,Y=py+ph-(1-chart[i])*ph*.9;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}
       ctx.strokeStyle='#52d9ff';ctx.lineWidth=1.6;ctx.stroke();ctx.lineTo(px+last/(chart.length-1)*pw,py+ph);ctx.lineTo(px,py+ph);ctx.closePath();ctx.fillStyle='rgba(82,217,255,.08)';ctx.fill()}
     ctx.restore();
   }
   // signals: back-to-front by depth so the fragmented field has parallax
-  cards.map((c,i)=>[c,states[i]]).sort((x,y)=>x[0].depth*(1-x[1].k)-y[0].depth*(1-y[1].k)).forEach(([c,s])=>drawCard(c,s));
+  cards.map((c,i)=>[c,states[i]]).sort((x,y)=>x[0].depth*(1-x[1].k)-y[0].depth*(1-y[1].k)).forEach(([c,s])=>{s.al*=intro;drawCard(c,s)});
+  ctx.restore();
 }
 
 function setSteps(p){
-  const r=[[0,.1],[.1,.37],[.37,.64],[.64,1.01]];let active=0;
-  steps.forEach((el,i)=>{const[s,e]=r[i],v=(i?ss(s-.02,s+.03,p):1)*(i<3?1-ss(e-.04,e+.01,p):1);el.style.opacity=v;el.style.transform=`translate3d(0,${(1-v)*24}px,0)`;el.style.visibility=v<.02?'hidden':'visible';if(v>.5)active=i});
-  if(active!==shown){shown=active;dots.forEach((d,i)=>d.classList.toggle('on',i<=active))}
+  const a=[.1,.37,.64].reduce((n,x)=>p>=x?n+1:n,0);
+  if(a!==shown){shown=a;steps.forEach((el,i)=>el.classList.toggle('on',i===a));dots.forEach((d,i)=>d.classList.toggle('on',i<=a))}
   if(bar)bar.style.transform=`scaleY(${p})`;
 }
 function target(){const r=sec.getBoundingClientRect(),len=r.height-innerHeight;return len>0?clamp(-r.top/len):0}
 function tick(t){if(!running)return;const tg=target();progress+=(tg-progress)*.11;if(Math.abs(tg-progress)<.0004)progress=tg;frame(progress,t);setSteps(progress);requestAnimationFrame(tick)}
 function start(){if(running||!visible)return;running=true;requestAnimationFrame(tick)}
-function still(){running=false;layout();frame(1,0)}
+function still(){running=false;layout();frame(1,t0+2000)}
 function init(){
   if(reduce.matches){document.documentElement.classList.add('reduced');still();return}
   layout();
   progress=target();frame(progress,performance.now());setSteps(progress);start();
 }
 new IntersectionObserver(([e])=>{visible=e.isIntersecting;if(visible&&!reduce.matches)start();else running=false}).observe(sec);
-addEventListener('resize',()=>{layout();if(!running)frame(reduce.matches?1:progress,performance.now())},{passive:true});
+addEventListener('resize',()=>{layout();if(!running)frame(reduce.matches?1:progress,reduce.matches?t0+2000:performance.now())},{passive:true});
 reduce.addEventListener?.('change',()=>location.reload());
-document.fonts?.ready.then(()=>{if(!running)frame(reduce.matches?1:progress,performance.now())});
+document.fonts?.ready.then(()=>{if(!running)frame(reduce.matches?1:progress,reduce.matches?t0+2000:performance.now())});
 init();
 })();

@@ -16,4 +16,4 @@ The inquiry form validates required fields and opens a pre-addressed email draft
 
 ## Homepage sequence
 
-The homepage hero is a scroll-scrubbed canvas sequence (`dist/assets/sequence.js`): fragmented signals → AI reads and classifies → policy routes → a governed dashboard. Each frame is drawn from scroll progress, so there are no video or frame images to download. All narrative copy is static HTML. With `prefers-reduced-motion` (or without JavaScript) the page shows the copy alongside a still of the final dashboard.
+The homepage hero is a scroll-scrubbed canvas sequence (`dist/assets/sequence.js`): fragmented signals → AI reads and classifies → policy routes → a governed dashboard. Each frame is drawn from scroll progress, so there are no video or frame images to download. All narrative copy is static HTML. `dist/assets/motion.js` adds site-wide smooth scrolling (vendored Lenis, MIT), masked headline reveals, scroll-linked section transitions, parallax, and magnetic buttons. With `prefers-reduced-motion` (or without JavaScript) the page shows the copy alongside a still of the final dashboard.
