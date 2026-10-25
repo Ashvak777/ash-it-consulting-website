@@ -161,7 +161,7 @@ function setSteps(p){
   if(bar)bar.style.transform=`scaleY(${p})`;
 }
 function target(){const r=sec.getBoundingClientRect(),len=r.height-innerHeight;return len>0?clamp(-r.top/len):0}
-function tick(t){if(!running)return;const tg=target();progress+=(tg-progress)*.11;if(Math.abs(tg-progress)<.0004)progress=tg;frame(progress,t);setSteps(progress);requestAnimationFrame(tick)}
+function tick(t){if(!running)return;const tg=target();progress+=(tg-progress)*.22;if(Math.abs(tg-progress)<.0004)progress=tg;frame(progress,t);setSteps(progress);requestAnimationFrame(tick)}
 function start(){if(running||!visible)return;running=true;requestAnimationFrame(tick)}
 function still(){running=false;layout();frame(1,t0+2000)}
 function init(){

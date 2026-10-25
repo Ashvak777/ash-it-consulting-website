@@ -26,12 +26,12 @@ function split(el){
 d.querySelectorAll('.seq h1,.seq h2').forEach(split);
 const heads=d.querySelectorAll('.section h2,.final-cta h2,.page-hero h1,.cap-row h3');
 heads.forEach(h=>{split(h);h.removeAttribute('data-reveal');h.setAttribute('data-split','')});
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -10% 0px'});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -4% 0px'});
 heads.forEach(h=>io.observe(h));
 
 // Smooth, weighted scrolling (desktop wheel; touch keeps native momentum).
 let lenis=null;
-if(window.Lenis){lenis=new Lenis({lerp:.09,wheelMultiplier:.9,smoothWheel:true});
+if(window.Lenis){lenis=new Lenis({lerp:.15,wheelMultiplier:1.1,smoothWheel:true});
   d.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=d.querySelector(a.getAttribute('href'));if(t){e.preventDefault();lenis.scrollTo(t,{offset:-90})}}));}
 
 // Scroll-linked pieces, updated in one rAF loop.
@@ -43,7 +43,7 @@ function update(){
   const y=scrollY,dy=y-lastY;lastY=y;
   if(header){if(dy>4&&y>240)header.classList.add('tuck');else if(dy<-4||y<120)header.classList.remove('tuck')}
   clips.forEach(el=>{const r=el.getBoundingClientRect();if(r.top>vh||r.bottom<0)return;
-    const e=ease(clamp((vh-r.top)/(vh*.75))),ins=(1-e)*Math.min(innerWidth*.045,56),rad=(1-e)*34;
+    const e=ease(clamp((vh-r.top)/(vh*.45))),ins=(1-e)*Math.min(innerWidth*.045,56),rad=(1-e)*34;
     el.style.clipPath=`inset(${ins*.5}px ${ins}px 0 ${ins}px round ${rad}px)`});
   para.forEach(el=>{const r=el.getBoundingClientRect();if(r.top>vh*1.2||r.bottom<-vh*.2)return;
     const off=(r.top+r.height/2-vh/2)*parseFloat(el.dataset.parallax);el.style.transform=`translate3d(0,${off.toFixed(1)}px,0)`});
