@@ -1,3 +1,7 @@
 {
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "redirects": [
+    { "source": "/services.html", "destination": "/solutions.html", "permanent": true },
+    { "source": "/public-sector.html", "destination": "/sovereignty.html", "permanent": true }
+  ]
 }
