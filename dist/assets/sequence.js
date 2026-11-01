@@ -9,19 +9,22 @@ const TAU=Math.PI*2,clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),mix=(a,b,t)=>a+
 const ss=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0));return t*t*(3-2*t)};
 const rng=(s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296})(2020);
 const COL={bronze:'#cd8a5a',silver:'#c9d3de',gold:'#e8c36a',cyan:'#52d9ff',blue:'#2978ff',ink:'#e9f3ff',mute:'#7f98b4',green:'#7ef0c4',teams:'#7b83eb'};
+const ICON={};['sql','dynamics','sharepoint','fabric','foundry','copilot','power-automate','power-bi','teams','entra','purview','defender','azure','m365-copilot'].forEach(n=>{const im=new Image();im.onload=()=>redraw();im.src=`assets/icons/${n}.svg`;ICON[n]=im});
+const drawIcon=(n,x,y,s)=>{const im=ICON[n];if(im&&im.complete&&im.naturalWidth)ctx.drawImage(im,x,y,s,s)};
 const mono=s=>`500 ${s}px "DM Mono",ui-monospace,monospace`,sans=(w,s)=>`${w} ${s}px Manrope,system-ui,sans-serif`;
 
 // ---- the world (units: 600 tall) ----
-const SRC=[['CSV','Sales extract','#a6f3b5','≡','raw_sales'],['FLAT FILE','ERP export','#ffcf8f','▤','raw_erp'],['EVENT STREAM','IoT sensors','#ff9fb2','≋','raw_iot'],['REST API','CRM records','#94fff0','{}','raw_crm'],['SQL SERVER','Orders DB','#8fb9ff','▦','raw_orders'],['DYNAMICS 365','Customers','#8fb9ff','D','raw_customers'],['SHAREPOINT','Documents','#7fd6c6','S','raw_docs'],['EXCEL','Budgets','#a6f3b5','X','raw_budgets'],['OUTLOOK','Email requests','#8fb9ff','@','raw_email'],['SAP','Invoices','#94fff0','S','raw_invoices'],['PARQUET','App logs','#d2b9ff','◫','raw_logs'],['JSON','Web events','#ffd36b','{}','raw_web']];
+const SRC=[['CSV','Sales extract','#a6f3b5','≡','raw_sales'],['FLAT FILE','ERP export','#ffcf8f','▤','raw_erp'],['EVENT STREAM','IoT sensors','#ff9fb2','≋','raw_iot'],['REST API','CRM records','#94fff0','{}','raw_crm'],['SQL SERVER','Orders DB','#8fb9ff','▦','raw_orders','sql'],['DYNAMICS 365','Customers','#8fb9ff','D','raw_customers','dynamics'],['SHAREPOINT','Documents','#7fd6c6','S','raw_docs','sharepoint'],['EXCEL','Budgets','#a6f3b5','X','raw_budgets'],['OUTLOOK','Email requests','#8fb9ff','@','raw_email'],['SAP','Invoices','#94fff0','S','raw_invoices'],['PARQUET','App logs','#d2b9ff','◫','raw_logs'],['JSON','Web events','#ffd36b','{}','raw_web']];
 const SILVER=[['orders_clean','deduplicated',[0,1,4]],['customers_clean','matched',[3,5]],['events_clean','validated',[2,10,11]],['invoices_clean','reconciled',[9]],['documents_parsed','extracted',[6,8]],['budgets_clean','typed',[7]]];
 const GOLD=[['Sales',[0,1]],['Customer 360',[1,2]],['Finance',[3,5]],['Operations',[2,4]]];
-const FOUNDRY=[['MODELS',[['GPT model','deployed'],['Forecasting','trained on gold'],['Anomaly detection','real-time']]],['KNOWLEDGE',[['AI Search index','RAG']]],['AGENTS',[['Fabric data agent','answers from gold'],['Foundry agent','plans and acts']]],['TOOLS',[['MCP server','ERP · CRM'],['Power Automate','runs workflows']]]];
+const FOUNDRY=[['AZURE AI FOUNDRY',[['GPT model','deployed','foundry'],['AI Search index','RAG','foundry'],['Foundry agent','plans and acts','foundry']]],['COPILOT',[['Copilot Studio agent','Teams · M365','copilot'],['Fabric data agent','answers from gold','fabric']]],['ACTIONS',[['Power Automate','runs workflows','power-automate'],['MCP server','ERP · CRM','']]]];
 const FAB={x:250,y:0,w:760,h:600},FD={x:1080,y:10,w:400,h:580},TM={x:1560,y:30,w:560,h:540};
 const srcPos=SRC.map((_,i)=>({x:0,y:21+i*47,w:200,h:40}));
 const bzPos=SRC.map((_,i)=>({x:270,y:96+i*41,w:220,h:34}));
 const svPos=SILVER.map((_,j)=>({x:510,y:136+j*68,w:220,h:54}));
 const gdPos=GOLD.map((_,k)=>({x:750,y:116+k*112,w:220,h:96}));
-const fdRows=[];{let y=FD.y+64;FOUNDRY.forEach(([g,rows])=>{fdRows.push({head:g,y});y+=22;rows.forEach(r=>{fdRows.push({name:r[0],sub:r[1],x:FD.x+10,y,w:FD.w-20,h:36});y+=42});y+=8})}
+const fdRows=[];{let y=FD.y+64;FOUNDRY.forEach(([g,rows])=>{fdRows.push({head:g,y});y+=22;rows.forEach(r=>{fdRows.push({name:r[0],sub:r[1],icon:r[2],x:FD.x+10,y,w:FD.w-20,h:36});y+=42});y+=12})}
+const GOV={x:250,y:628,w:1870,h:56},GOV_CHIPS=[['entra','Entra ID'],['purview','Purview'],['defender','Defender'],['azure','Azure Private Link']];
 const fdIdx=n=>fdRows.find(r=>r.name===n);
 const goldBars=GOLD.map(()=>Array.from({length:7},()=>.3+rng()*.7)),teamBars=Array.from({length:7},()=>.25+rng()*.75);
 const cards=SRC.map((s,i)=>({i,fx:rng(),fy:rng(),rot:(rng()-.5)*.5,depth:.6+rng()*.4,ph:rng()*TAU,sp:.6+rng()*.8}));
@@ -35,16 +38,17 @@ const links=[];
 SRC.forEach((_,i)=>links.push([right(srcPos[i]),left(bzPos[i]),revBz(i),COL.bronze]));
 SILVER.forEach(([,,from],j)=>from.forEach(i=>links.push([right(bzPos[i]),left(svPos[j]),revSv(j),COL.silver])));
 GOLD.forEach(([,from],k)=>from.forEach(j=>links.push([right(svPos[j]),left(gdPos[k]),revGd(k),COL.gold])));
-[['Fabric data agent',[0,1,2,3]],['Forecasting',[0,3]],['AI Search index',[1]],['Anomaly detection',[3]]].forEach(([n,ks])=>ks.forEach(k=>links.push([right(gdPos[k]),left(fdIdx(n)),revFd(n),COL.gold])));
-[['Fabric data agent',0],['Foundry agent',90],['Power Automate',200]].forEach(([n,dy])=>links.push([right(fdIdx(n)),{x:TM.x,y:TM.y+180+dy},p=>revTeams(p)*revFd(n)(p),COL.cyan]));
+[['Fabric data agent',[0,1,2,3]],['Foundry agent',[0,3]],['AI Search index',[1]],['GPT model',[2]]].forEach(([n,ks])=>ks.forEach(k=>links.push([right(gdPos[k]),left(fdIdx(n)),revFd(n),COL.gold])));
+[['Fabric data agent',0],['Copilot Studio agent',90],['Power Automate',200]].forEach(([n,dy])=>links.push([right(fdIdx(n)),{x:TM.x,y:TM.y+180+dy},p=>revTeams(p)*revFd(n)(p),COL.cyan]));
 links.forEach(l=>l.seed=rng());
 
 // camera keyframes: [progress, frame in world units]
 const F=(x,w)=>({x,y:-20,w,h:640});
-const CAM_WIDE=[[0,F(-10,1030)],[.37,F(-10,1030)],[.47,F(720,790)],[.64,F(720,790)],[.74,F(1400,740)],[1,F(1400,740)]];
+const G=(x,w)=>({x,y:-20,w,h:720});
+const CAM_WIDE=[[0,G(-10,1030)],[.37,G(-10,1030)],[.47,G(720,790)],[.64,G(720,790)],[.74,G(1400,740)],[1,G(1400,740)]];
 const CAM_NARROW=[[0,F(-15,230)],[.22,F(-15,230)],[.25,F(255,250)],[.27,F(255,250)],[.3,F(495,250)],[.32,F(495,250)],[.35,F(735,250)],[.42,F(735,250)],[.47,F(1065,430)],[.64,F(1065,430)],[.72,F(1545,590)],[1,F(1545,590)]];
 
-let W=0,H=0,dpr=1,R,cam,cwPx,progress=0,shown=-1,running=false,visible=false;
+let redraw=()=>{},W=0,H=0,dpr=1,R,cam,cwPx,progress=0,shown=-1,running=false,visible=false;
 function layout(){
   const r=canvas.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(devicePixelRatio||1,2);
   canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
@@ -71,8 +75,8 @@ function bezier(a,b,t){const dx=(b.x-a.x)*.5,u=1-t;return{x:u*u*u*a.x+3*u*u*t*(a
 function srcCard(s){
   // base card 200×40, centred on the origin
   panel(-100,-20,200,40,9,'rgba(145,202,255,.24)');
-  rr(-92,-13,26,26,7);ctx.fillStyle=hexA(s[2],.16);ctx.fill();
-  txt(s[3],-79,1,sans(800,s[3].length>1?11:13),s[2],'center');
+  rr(-92,-13,26,26,7);ctx.fillStyle=s[5]?'rgba(255,255,255,.08)':hexA(s[2],.16);ctx.fill();
+  if(s[5]&&ICON[s[5]].naturalWidth)drawIcon(s[5],-88,-9,18);else txt(s[3],-79,1,sans(800,s[3].length>1?11:13),s[2],'center');
   txt(s[0],-56,-5,mono(9.5),COL.mute);
   ctx.font=sans(700,12.5);txt(fit(s[1],148),-56,10,sans(700,12.5),COL.ink);
 }
@@ -87,13 +91,20 @@ function frame(p,t){
 
   // Fabric / OneLake
   if(fabA>.01){ctx.globalAlpha=fabA;panel(FAB.x,FAB.y,FAB.w,FAB.h,18,'rgba(145,202,255,.2)','rgba(10,26,45,.72)');
-    txt('Microsoft Fabric',FAB.x+20,FAB.y+30,sans(800,16),COL.ink);txt('ONELAKE',FAB.x+FAB.w-20,FAB.y+30,mono(10),COL.cyan,'right');
+    drawIcon('fabric',FAB.x+18,FAB.y+19,22);txt('Microsoft Fabric',FAB.x+48,FAB.y+30,sans(800,16),COL.ink);txt('ONELAKE',FAB.x+FAB.w-20,FAB.y+30,mono(10),COL.cyan,'right');
     [['BRONZE · RAW',270,COL.bronze],['SILVER · CLEANED',510,COL.silver],['GOLD · BUSINESS-READY',750,COL.gold]].forEach(([l,x,col])=>{txt(l,x,72,mono(9.5),col);ctx.fillStyle=hexA(col,.4);ctx.fillRect(x,82,220,1)});
     ctx.globalAlpha=1}
   // Azure AI Foundry
   if(fdA>.01){ctx.globalAlpha=fdA;panel(FD.x,FD.y,FD.w,FD.h,18,'rgba(145,202,255,.2)','rgba(10,26,45,.72)');
-    txt('Azure AI Foundry',FD.x+20,FD.y+30,sans(800,16),COL.ink);txt('MODELS · AGENTS',FD.x+FD.w-20,FD.y+30,mono(9.5),COL.cyan,'right');ctx.globalAlpha=1}
+    drawIcon('foundry',FD.x+18,FD.y+19,22);txt('Agents & AI',FD.x+48,FD.y+30,sans(800,16),COL.ink);txt('FOUNDRY · COPILOT',FD.x+FD.w-20,FD.y+30,mono(9.5),COL.cyan,'right');ctx.globalAlpha=1}
 
+  // security & governance across every layer
+  const govA=ss(.2,.3,p);
+  if(govA>.01){ctx.globalAlpha=govA;rr(GOV.x,GOV.y,GOV.w,GOV.h,14);ctx.fillStyle='rgba(82,217,255,.05)';ctx.fill();ctx.setLineDash([5,6]);ctx.strokeStyle='rgba(82,217,255,.4)';ctx.stroke();ctx.setLineDash([]);
+    txt('SECURITY & GOVERNANCE · CANADA CENTRAL & EAST',GOV.x+20,GOV.y+GOV.h/2,mono(9.5),COL.cyan);
+    ctx.font=sans(700,12);const cw=GOV_CHIPS.map(([,l])=>ctx.measureText(l).width+44),gw=cw.reduce((a,b)=>a+b+10,0);
+    for(let x=GOV.x+330;x+gw<GOV.x+GOV.w;x+=gw+70)GOV_CHIPS.forEach(([n,l],k)=>{const cx=x+cw.slice(0,k).reduce((a,b)=>a+b+10,0);rr(cx,GOV.y+13,cw[k],30,9);ctx.fillStyle='rgba(255,255,255,.06)';ctx.fill();ctx.strokeStyle='rgba(145,202,255,.2)';ctx.stroke();drawIcon(n,cx+10,GOV.y+19,18);txt(l,cx+34,GOV.y+GOV.h/2,sans(700,12),COL.ink)});
+    ctx.globalAlpha=1}
   // pipes with data flowing through them
   links.forEach(l=>{const a=l[2](p)*intro;if(a<.01)return;const[A,B]=l,dx=(B.x-A.x)*.5;
     ctx.globalAlpha=a*.5;ctx.strokeStyle=hexA(l[3],.55);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.bezierCurveTo(A.x+dx,A.y,B.x-dx,B.y,B.x,B.y);ctx.stroke();
@@ -115,8 +126,8 @@ function frame(p,t){
   fdRows.forEach(r=>{if(r.head){if(fdA<.01)return;ctx.globalAlpha=fdA;txt(r.head,FD.x+20,r.y+10,mono(9),COL.cyan);return}
     const a=revFd(r.name)(p);if(a<.01)return;ctx.globalAlpha=a;const x=r.x-(1-a)*14;
     panel(x,r.y,r.w,r.h,9,'rgba(145,202,255,.24)');
-    ctx.fillStyle=hexA(COL.green,.6+.4*Math.sin(t*.004+r.y));ctx.beginPath();ctx.arc(x+16,r.y+18,3.2,0,TAU);ctx.fill();
-    txt(r.name,x+30,r.y+18,sans(700,12.5),COL.ink);txt(r.sub.toUpperCase(),x+r.w-12,r.y+18,mono(9.5),COL.mute,'right')});
+    if(r.icon&&ICON[r.icon].naturalWidth)drawIcon(r.icon,x+9,r.y+8,20);else{ctx.fillStyle=hexA(COL.green,.6+.4*Math.sin(t*.004+r.y));ctx.beginPath();ctx.arc(x+18,r.y+18,3.2,0,TAU);ctx.fill()}
+    txt(r.name,x+36,r.y+18,sans(700,12.5),COL.ink);txt(r.sub.toUpperCase(),x+r.w-12,r.y+18,mono(9.5),COL.mute,'right')});
   ctx.globalAlpha=1;
 
   // Microsoft Teams
@@ -124,7 +135,7 @@ function frame(p,t){
     panel(X,Y,TM.w,TM.h,16,'rgba(145,202,255,.26)','rgba(12,24,42,.97)');
     rr(X,Y,TM.w,34,16);ctx.fillStyle='rgba(6,14,26,.9)';ctx.fill();ctx.fillRect(X,Y+18,TM.w,16);
     ['#ff7b72','#ffc46b','#7ef0c4'].forEach((col,n)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(X+18+n*14,Y+17,4,0,TAU);ctx.fill()});
-    txt('Microsoft Teams',X+TM.w/2,Y+17,mono(10),COL.mute,'center');
+    drawIcon('teams',X+TM.w/2-66,Y+9,16);txt('Microsoft Teams',X+TM.w/2+10,Y+17,mono(10),COL.mute,'center');
     ctx.fillStyle='rgba(6,14,26,.6)';ctx.fillRect(X,Y+34,56,TM.h-50);
     [0,1,2,3].forEach(n=>{rr(X+14,Y+52+n*44,28,28,7);ctx.fillStyle=n===1?hexA(COL.teams,.85):'rgba(145,202,255,.12)';ctx.fill()});
     const cx=X+76,cw=TM.w-96;
@@ -139,11 +150,11 @@ function frame(p,t){
       txt('Fabric data agent',bx+14,by+18,sans(800,11.5),COL.cyan);
       ctx.font=sans(500,12);wrap('Here are this week’s at-risk orders from the gold Sales table.',bw-28).forEach((ln,n)=>txt(ln,bx+14,by+38+n*16,sans(500,12),COL.ink));
       const chA=ss(.81,.86,p);ctx.globalAlpha=tmA*m2*Math.max(.15,chA);
-      panel(bx+14,by+70,bw-28,94,9,'rgba(232,195,106,.3)','rgba(7,19,34,.7)');txt('POWER BI · ORDERS AT RISK',bx+26,by+84,mono(9.5),COL.gold);
+      panel(bx+14,by+70,bw-28,94,9,'rgba(232,195,106,.3)','rgba(7,19,34,.7)');drawIcon('power-bi',bx+24,by+76,15);txt('POWER BI · ORDERS AT RISK',bx+44,by+84,mono(9.5),COL.gold);
       const gw=(bw-60)/teamBars.length;teamBars.forEach((h,i)=>{const bh=h*52*chA;ctx.fillStyle=hexA(i===4?COL.gold:COL.blue,i===4?.9:.6);ctx.fillRect(bx+26+i*gw,by+156-bh,gw*.62,bh)})}
     const m3=ss(.87,.92,p);if(m3>.01){ctx.globalAlpha=tmA*m3;const bx=cx+36,bw=cw-60,by=Y+362+(1-m3)*10;
       panel(bx,by,bw,84,12,hexA(COL.green,.35),'rgba(20,40,66,.9)');
-      txt('POWER AUTOMATE · APPROVAL',bx+14,by+18,mono(9.5),COL.green);txt('Approve the automated reorder?',bx+14,by+38,sans(700,12.5),COL.ink);
+      drawIcon('power-automate',bx+12,by+10,15);txt('POWER AUTOMATE · APPROVAL',bx+32,by+18,mono(9.5),COL.green);txt('Approve the automated reorder?',bx+14,by+38,sans(700,12.5),COL.ink);
       rr(bx+14,by+52,84,22,6);ctx.fillStyle=COL.blue;ctx.fill();txt('Approve',bx+56,by+63,sans(700,11),'#fff','center');
       rr(bx+106,by+52,84,22,6);ctx.strokeStyle='rgba(145,202,255,.4)';ctx.stroke();txt('Review',bx+148,by+63,sans(700,11),COL.ink,'center')}
     ctx.globalAlpha=tmA;rr(cx,Y+TM.h-48,cw,32,9);ctx.strokeStyle='rgba(145,202,255,.2)';ctx.stroke();txt('Ask the agent…',cx+14,Y+TM.h-32,sans(500,11.5),COL.mute);
@@ -182,7 +193,7 @@ function init(){
   layout();progress=target();frame(progress,performance.now());setSteps(progress);start();
 }
 new IntersectionObserver(([e])=>{visible=e.isIntersecting;if(visible&&!reduce.matches)start();else running=false}).observe(sec);
-const redraw=()=>{if(!running)frame(reduce.matches?1:progress,reduce.matches?t0+4000:performance.now())};
+redraw=()=>{if(!running)frame(reduce.matches?1:progress,reduce.matches?t0+4000:performance.now())};
 addEventListener('resize',()=>{layout();redraw()},{passive:true});
 reduce.addEventListener?.('change',()=>location.reload());
 document.fonts?.ready.then(redraw);
