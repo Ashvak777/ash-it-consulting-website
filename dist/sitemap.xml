@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://ash-it-consulting-website.vercel.app/</loc></url><url><loc>https://ash-it-consulting-website.vercel.app/solutions.html</loc></url><url><loc>https://ash-it-consulting-website.vercel.app/sovereignty.html</loc></url><url><loc>https://ash-it-consulting-website.vercel.app/about.html</loc></url><url><loc>https://ash-it-consulting-website.vercel.app/contact.html</loc></url><url><loc>https://ash-it-consulting-website.vercel.app/privacy.html</loc></url></urlset>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.ashitconsulting.ai/</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/solutions</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/solutions/fabric-data-engineering</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/solutions/secure-ai-agents</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/solutions/actionable-automation</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/solutions/saas-product-delivery</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/sovereignty</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/about</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/contact</loc><lastmod>2026-11-01</lastmod></url>
+  <url><loc>https://www.ashitconsulting.ai/privacy</loc><lastmod>2026-11-01</lastmod></url>
+</urlset>

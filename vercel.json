@@ -1,7 +1,9 @@
 {
   "outputDirectory": "dist",
+  "cleanUrls": true,
   "redirects": [
-    { "source": "/services.html", "destination": "/solutions.html", "permanent": true },
-    { "source": "/public-sector.html", "destination": "/sovereignty.html", "permanent": true }
+    { "source": "/index", "destination": "/", "permanent": true },
+    { "source": "/services", "destination": "/solutions", "permanent": true },
+    { "source": "/public-sector", "destination": "/sovereignty", "permanent": true }
   ]
 }
