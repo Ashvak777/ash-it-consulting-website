@@ -22,7 +22,7 @@
 .seq-cue i{display:block;width:1px;height:34px;background:linear-gradient(#52d9ff,transparent);animation:cue 2.2s ease-in-out infinite}
 .seq-rail,.seq-progress{display:none}
 /* pinned, scrubbed layout only when JS runs and motion is allowed */
-.js:not(.reduced) .seq{height:320vh}
+.js:not(.reduced) .seq{height:380vh}
 .js:not(.reduced) .seq-sticky{position:sticky;top:0;height:100svh;min-height:0}
 .js:not(.reduced) .seq-step{position:absolute;left:0;top:50%;translate:0 -50%;width:min(46vw,680px);max-width:none;padding-top:0;padding-bottom:0}
 .js:not(.reduced) .seq-step{opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s}

@@ -39,8 +39,8 @@ const goldBars=GOLD.map(()=>Array.from({length:7},()=>.3+rng()*.7)),dashBars=Arr
 const cards=SRC.map((s,i)=>({i,fx:rng(),fy:rng(),rot:(rng()-.5)*.5,depth:.65+rng()*.35,ph:rng()*TAU,sp:.6+rng()*.8}));
 
 // reveal timings (scroll progress)
-const revBz=i=>p=>ss(.17+i*.008,.21+i*.008,p),revSv=i=>p=>ss(.24+i*.01,.28+i*.01,p),revGd=k=>p=>ss(.3+k*.012,.34+k*.012,p);
-const revAg=r=>p=>ss(.46+r*.02,.5+r*.02,p),revPW=p=>ss(.66,.72,p),revTM=p=>ss(.68,.74,p),revDB=p=>ss(.74,.78,p),revCC=p=>ss(.8,.84,p);
+const revBz=i=>p=>ss(.31+i*.008,.35+i*.008,p),revSv=i=>p=>ss(.36+i*.008,.4+i*.008,p),revGd=k=>p=>ss(.41+k*.012,.45+k*.012,p);
+const revAg=r=>p=>ss(.52+r*.02,.56+r*.02,p),revPW=p=>ss(.7,.76,p),revTM=p=>ss(.72,.78,p),revDB=p=>ss(.78,.82,p),revCC=p=>ss(.84,.88,p);
 
 // connectors: [from, to, reveal(p), colour]
 const right=r=>({x:r.x+r.w,y:r.y+r.h/2}),left=r=>({x:r.x,y:r.y+r.h/2});
@@ -56,8 +56,8 @@ links.forEach(l=>l.seed=rng());
 
 // camera keyframes: [progress, frame in world units]
 const F=(x,w)=>({x,y:-20,w,h:640}),G=(x,w)=>({x,y:-20,w,h:720});
-const CAM_WIDE=[[0,G(-10,1030)],[.37,G(-10,1030)],[.47,G(730,770)],[.64,G(730,770)],[.74,G(1480,740)],[1,G(1480,740)]];
-const CAM_NARROW=[[0,F(-15,230)],[.22,F(-15,230)],[.25,F(258,245)],[.27,F(258,245)],[.3,F(498,245)],[.32,F(498,245)],[.35,F(738,265)],[.42,F(738,265)],[.47,F(1065,430)],[.64,F(1065,430)],[.72,F(1550,660)],[1,F(1550,660)]];
+const CAM_WIDE=[[0,G(-200,600)],[.24,G(-200,600)],[.32,G(-10,1030)],[.46,G(-10,1030)],[.55,G(730,770)],[.66,G(730,770)],[.75,G(1480,740)],[1,G(1480,740)]];
+const CAM_NARROW=[[0,F(-15,230)],[.28,F(-15,230)],[.31,F(258,245)],[.35,F(258,245)],[.38,F(498,245)],[.41,F(498,245)],[.44,F(738,265)],[.5,F(738,265)],[.55,F(1065,430)],[.68,F(1065,430)],[.76,F(1550,660)],[1,F(1550,660)]];
 
 let redraw=()=>{},W=0,H=0,dpr=1,R,cam,cwPx,progress=0,shown=-1,running=false,visible=false;
 function layout(){
@@ -109,13 +109,13 @@ function frame(p,t){
   const intro=ss(0,1400,t-t0);
   ctx.fillStyle='rgba(122,190,255,.08)';for(let x=(t*.004)%28;x<W;x+=28)for(let y=6;y<H;y+=28)ctx.fillRect(x,y,1.2,1.2);
   const c=camAt(p);ctx.setTransform(dpr*c.s,0,0,dpr*c.s,dpr*c.ox,dpr*c.oy);ctx.textBaseline='middle';
-  const srcA=ss(.12,.2,p),fabA=ss(.12,.2,p),fdA=ss(.42,.5,p),pwA=revPW(p);
+  const srcA=ss(.12,.2,p),fabA=ss(.27,.33,p),fdA=ss(.48,.55,p),pwA=revPW(p);
 
   // 01 · Your data
   if(srcA>.01){ctx.globalAlpha=srcA;txt('01 · YOUR DATA',0,118,mono(10),COL.cyan);ctx.fillStyle=hexA(COL.cyan,.35);ctx.fillRect(0,128,200,1);ctx.globalAlpha=1}
   // 02 · Microsoft Fabric · OneLake, with the panel's five tools lighting up as each step runs
   if(fabA>.01){layerPanel(FAB,'02 · ONELAKE','fabric','Microsoft Fabric',fabA);
-    const glow=[ss(.17,.2,p)*(1-ss(.26,.3,p)),ss(.24,.27,p)*(1-ss(.32,.36,p)),ss(.3,.33,p)*(1-ss(.4,.44,p)),.4+.4*Math.sin(t*.004),ss(.32,.35,p)*(1-ss(.4,.44,p))];
+    const glow=[ss(.31,.34,p)*(1-ss(.37,.4,p)),ss(.36,.39,p)*(1-ss(.42,.45,p)),ss(.41,.44,p)*(1-ss(.5,.54,p)),.4+.4*Math.sin(t*.004),ss(.43,.46,p)*(1-ss(.5,.54,p))];
     let x=FAB.x+18;FAB_TOOLS.forEach(([ic,l],k)=>{x+=chip(x,50,ic,l,glow[k]*fabA,11.5)+8});
     [['BRONZE · RAW',270,220,COL.bronze],['SILVER · CLEANED',510,220,COL.silver],['GOLD · WAREHOUSE & POWER BI',750,240,COL.gold]].forEach(([l,x,w,col])=>{txt(l,x,108,mono(9.5),col);ctx.fillStyle=hexA(col,.4);ctx.fillRect(x,118,w,1)});
     ctx.globalAlpha=1}
@@ -125,7 +125,7 @@ function frame(p,t){
   if(pwA>.01){layerPanel(PW,'04','teams','Where people work',pwA);ctx.globalAlpha=1}
 
   // security & governance across every layer
-  const govA=ss(.2,.3,p);
+  const govA=ss(.3,.38,p);
   if(govA>.01){ctx.globalAlpha=govA;rr(GOV.x,GOV.y,GOV.w,GOV.h,14);ctx.fillStyle='rgba(82,217,255,.05)';ctx.fill();ctx.setLineDash([5,6]);ctx.strokeStyle='rgba(82,217,255,.4)';ctx.stroke();ctx.setLineDash([]);
     txt('SECURITY & GOVERNANCE ACROSS EVERY LAYER · CANADA CENTRAL · CANADA EAST',GOV.x+20,GOV.y+GOV.h/2,mono(9.5),COL.cyan);
     ctx.font=sans(700,12);const cw=GOV_CHIPS.map(([,l])=>ctx.measureText(l).width+40),gw=cw.reduce((a,b)=>a+b+8,0);
@@ -148,7 +148,7 @@ function frame(p,t){
   gdPos.forEach((g,k)=>{const a=revGd(k)(p);if(a<.01)return;ctx.globalAlpha=a;const x=g.x-(1-a)*14;
     panel(x,g.y,g.w,g.h,12,hexA(COL.gold,.5),'rgba(232,195,106,.07)');
     txt(GOLD[k][0],x+14,g.y+22,sans(800,15),COL.gold);txt(GOLD[k][1],x+14,g.y+40,mono(9),COL.mute);
-    const gr=ss(.33+k*.012,.4+k*.012,p);goldBars[k].forEach((h,n)=>{const bh=h*30*gr;ctx.fillStyle=hexA(COL.gold,.35+n*.06);ctx.fillRect(x+14+n*30,g.y+g.h-12-bh,20,bh)})});
+    const gr=ss(.44+k*.012,.5+k*.012,p);goldBars[k].forEach((h,n)=>{const bh=h*30*gr;ctx.fillStyle=hexA(COL.gold,.35+n*.06);ctx.fillRect(x+14+n*30,g.y+g.h-12-bh,20,bh)})});
   ctx.globalAlpha=1;
   // agents & AI rows
   agPos.forEach((r,i)=>{const a=revAg(i)(p);if(a<.01)return;ctx.globalAlpha=a;const x=r.x-(1-a)*14;
@@ -169,13 +169,13 @@ function frame(p,t){
     txt('Operations',cx,Y+54,sans(800,14),COL.ink);ctx.font=sans(800,14);const ow=ctx.measureText('Operations').width;
     rr(cx+ow+10,Y+45,52,18,9);ctx.fillStyle=hexA(COL.cyan,.14);ctx.fill();txt('AGENT',cx+ow+36,Y+54,mono(9),COL.cyan,'center');
     ctx.fillStyle='rgba(145,202,255,.12)';ctx.fillRect(cx,Y+72,cw,1);
-    const m1=ss(.72,.75,p);if(m1>.01){ctx.globalAlpha=tmA*m1;const bw=226,bx=cx+cw-bw,by=Y+88+(1-m1)*10;rr(bx,by,bw,34,12);ctx.fillStyle='rgba(41,120,255,.3)';ctx.fill();txt('Which orders are at risk this week?',bx+12,by+17,sans(600,11.5),COL.ink)}
-    const m2=ss(.76,.79,p);if(m2>.01){ctx.globalAlpha=tmA*m2;const by=Y+138+(1-m2)*10;
+    const m1=ss(.77,.8,p);if(m1>.01){ctx.globalAlpha=tmA*m1;const bw=226,bx=cx+cw-bw,by=Y+88+(1-m1)*10;rr(bx,by,bw,34,12);ctx.fillStyle='rgba(41,120,255,.3)';ctx.fill();txt('Which orders are at risk this week?',bx+12,by+17,sans(600,11.5),COL.ink)}
+    const m2=ss(.81,.84,p);if(m2>.01){ctx.globalAlpha=tmA*m2;const by=Y+138+(1-m2)*10;
       rr(cx,by,26,26,8);ctx.fillStyle='rgba(255,255,255,.08)';ctx.fill();drawIcon('copilot',cx+5,by+5,16);
       const bx=cx+34,bw=cw-34;ctx.font=sans(500,11.5);const lines=wrap('Two orders are late against plan. I drafted a reorder for your approval.',bw-24);
       panel(bx,by,bw,34+lines.length*16,12,'rgba(145,202,255,.18)','rgba(20,40,66,.9)');
       txt('Copilot Studio agent',bx+12,by+16,sans(800,11),COL.cyan);lines.forEach((ln,n)=>txt(ln,bx+12,by+34+n*16,sans(500,11.5),COL.ink))}
-    const m3=ss(.82,.85,p);if(m3>.01){ctx.globalAlpha=tmA*m3;const bx=cx+34,bw=cw-34,by=Y+238+(1-m3)*10;
+    const m3=ss(.87,.9,p);if(m3>.01){ctx.globalAlpha=tmA*m3;const bx=cx+34,bw=cw-34,by=Y+238+(1-m3)*10;
       panel(bx,by,bw,96,12,hexA(COL.green,.35),'rgba(20,40,66,.9)');
       drawIcon('power-automate',bx+12,by+10,15);txt('POWER AUTOMATE · APPROVAL',bx+32,by+18,mono(9),COL.green);txt('Approve the reorder?',bx+12,by+42,sans(700,12.5),COL.ink);
       rr(bx+12,by+60,84,24,6);ctx.fillStyle=COL.blue;ctx.fill();txt('Approve',bx+54,by+72,sans(700,11),'#fff','center');
@@ -186,7 +186,7 @@ function frame(p,t){
   if(dbA>.01){ctx.globalAlpha=dbA;const X=DB.x,Y=DB.y-(1-dbA)*10;
     panel(X,Y,DB.w,DB.h,14,hexA(COL.gold,.35),'rgba(12,24,42,.97)');
     drawIcon('power-bi',X+14,Y+14,20);txt('Dashboards',X+42,Y+24,sans(800,13.5),COL.ink);txt('POWER BI · SALES · GOLD',X+14,Y+52,mono(9),COL.gold);
-    const gr=ss(.78,.84,p),n=dashBars.length,gw=(DB.w-28)/n;
+    const gr=ss(.82,.88,p),n=dashBars.length,gw=(DB.w-28)/n;
     dashBars.forEach((h,i)=>{const bh=h*120*gr;ctx.fillStyle=hexA(i===5?COL.gold:COL.blue,i===5?.9:.6);ctx.fillRect(X+14+i*gw,Y+DB.h-22-bh,gw*.62,bh)});
     ctx.globalAlpha=1}
   const ccA=revCC(p);
@@ -195,7 +195,7 @@ function frame(p,t){
     drawIcon('m365-copilot',X+14,Y+14,20);txt('Copilot chat',X+42,Y+24,sans(800,13.5),COL.ink);
     ctx.font=sans(600,11.5);const q=wrap('Summarize Customer 360 for this account',CC.w-52);rr(X+CC.w-14-(CC.w-40),Y+46,CC.w-40,14+q.length*16,11);ctx.fillStyle='rgba(41,120,255,.3)';ctx.fill();
     q.forEach((ln,n)=>txt(ln,X+38,Y+62+n*16,sans(600,11.5),COL.ink));
-    const an=ss(.84,.9,p);[1,.92,.7,.84,.5].forEach((w,n)=>{rr(X+14,Y+112+n*18,(CC.w-28)*w*an,8,4);ctx.fillStyle='rgba(145,202,255,.22)';ctx.fill()});
+    const an=ss(.88,.94,p);[1,.92,.7,.84,.5].forEach((w,n)=>{rr(X+14,Y+112+n*18,(CC.w-28)*w*an,8,4);ctx.fillStyle='rgba(145,202,255,.22)';ctx.fill()});
     ctx.globalAlpha=ccA*an;txt('SOURCES · CUSTOMER 360 · SHAREPOINT',X+14,Y+CC.h-22,mono(8.5),COL.cyan);
     ctx.globalAlpha=1}
 
@@ -207,8 +207,8 @@ function frame(p,t){
   wide?ctx.fillRect(0,0,R.x,H):ctx.fillRect(0,R.y+R.h-40,W,H);
   ctx.globalCompositeOperation='source-over';ctx.setTransform(dpr*c.s,0,0,dpr*c.s,dpr*c.ox,dpr*c.oy);ctx.textBaseline='middle';
   // 01 · Your data cards: out of the hero panel → lined up as the pipeline's inputs (faded once the camera leaves them)
-  const leave=ss(.38,.45,p);
-  cards.forEach(cd=>{const i=cd.i,o=i*.008,a=ss(.06+o,.2+o,p);
+  const leave=ss(.5,.56,p);
+  cards.forEach(cd=>{const i=cd.i,o=i*.008,a=ss(.05+o,.15+o,p);
     const dx=Math.sin(t*.00035*cd.sp+cd.ph)*W*.012,dy=Math.cos(t*.0003*cd.sp+cd.ph)*H*.014;
     const sx=(wide?W*(.42+cd.fx*.46):W*(.06+cd.fx*.7))+dx,sy=(wide?H*(.12+cd.fy*.76):H*(.06+cd.fy*.55))+dy;
     const k0=cwPx*cd.depth/200/c.s,dst=srcPos[i];
@@ -219,7 +219,7 @@ function frame(p,t){
 }
 
 function setSteps(p){
-  const a=[.1,.37,.64].reduce((n,x)=>p>=x?n+1:n,0);
+  const a=[.08,.28,.48,.68].reduce((n,x)=>p>=x?n+1:n,0);
   if(a!==shown){shown=a;steps.forEach((el,i)=>el.classList.toggle('on',i===a));dots.forEach((d,i)=>d.classList.toggle('on',i<=a))}
   if(bar)bar.style.transform=`scaleY(${p})`;
   if(arch){const v=1-ss(.02,.08,p);arch.style.opacity=v;arch.style.transform=`scale(${.94+.06*v})`;arch.style.visibility=v<.01?'hidden':'visible'}
