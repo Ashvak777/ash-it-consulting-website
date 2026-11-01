@@ -10,7 +10,7 @@ const TAU=Math.PI*2,clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),mix=(a,b,t)=>a+
 const ss=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0));return t*t*(3-2*t)};
 const rng=(s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296})(2020);
 const COL={bronze:'#cd8a5a',silver:'#c9d3de',gold:'#e8c36a',cyan:'#52d9ff',blue:'#2978ff',ink:'#e9f3ff',mute:'#7f98b4',green:'#7ef0c4',teams:'#7b83eb'};
-const ICON={};['sql','dynamics','sharepoint','fabric','fabric-data-factory','fabric-data-engineering','fabric-warehouse','fabric-realtime','power-bi','foundry','copilot','m365-copilot','power-automate','teams','entra','purview','defender','azure'].forEach(n=>{const im=new Image();im.onload=()=>redraw();im.src=`assets/icons/${n}.svg`;ICON[n]=im});
+const ICON={};['sql','dynamics','sharepoint','fabric','fabric-data-factory','fabric-data-engineering','fabric-warehouse','fabric-realtime','power-bi','foundry','copilot','m365-copilot','power-automate','teams','entra','purview','defender','azure'].forEach(n=>{const im=new Image();im.onload=()=>redraw();im.src=`/assets/icons/${n}.svg`;ICON[n]=im});
 const hasIcon=n=>n&&ICON[n]&&ICON[n].complete&&ICON[n].naturalWidth;
 const drawIcon=(n,x,y,s)=>{if(hasIcon(n))ctx.drawImage(ICON[n],x,y,s,s)};
 const mono=s=>`500 ${s}px "DM Mono",ui-monospace,monospace`,sans=(w,s)=>`${w} ${s}px Manrope,system-ui,sans-serif`;
