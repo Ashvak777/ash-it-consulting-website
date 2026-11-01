@@ -163,3 +163,23 @@ html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!
 @media(max-width:1000px){.pillars,.split2,.solution{grid-template-columns:1fr}.sov-grid,.region{grid-template-columns:1fr 1fr}.metrics,.roles{grid-template-columns:1fr 1fr}.metrics div:nth-child(2){border-right:0}.metrics div:nth-child(-n+2){border-bottom:1px solid #d8e2ed}}
 @media(max-width:620px){.sov-grid,.region,.feat,.metrics,.roles{grid-template-columns:1fr}.metrics div{border-right:0;border-bottom:1px solid #d8e2ed}.metrics div:last-child{border-bottom:0}.pillar{padding:24px}.seq .badges{margin-top:22px}}
 .footer{gap:0 10vw}.footer-links{margin-bottom:8px}
+/* hero: reference architecture panel (desktop), dissolves into the scroll sequence */
+.seq-arch{display:none}
+.js:not(.reduced) .seq-arch{display:block;position:absolute;z-index:2;right:clamp(120px,9vw,150px);top:50%;translate:0 -50%;width:min(40vw,540px);transform-origin:50% 50%;will-change:opacity,transform}
+.arch{background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.13);border-radius:22px;padding:20px;backdrop-filter:blur(6px);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.arch-top{display:flex;justify-content:space-between;align-items:center;font:500 10px 'DM Mono',monospace;letter-spacing:.12em;color:#8ea3bd;margin-bottom:14px;text-transform:uppercase}
+.arch-top b{color:#fff;font-weight:500;display:flex;align-items:center;gap:7px}
+.arch-top b:before{content:"";width:7px;height:7px;border-radius:50%;background:#7ef0c4;box-shadow:0 0 0 4px rgba(126,240,196,.16)}
+.layer{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;background:rgba(7,17,31,.55);position:relative}
+.layer+.layer{margin-top:20px}
+.layer+.layer:before{content:"";position:absolute;left:50%;top:-20px;height:20px;width:2px;background:linear-gradient(#52d9ff,#2978ff);opacity:.7}
+.layer+.layer:after{content:"";position:absolute;left:calc(50% - 4px);top:-6px;border:4px solid transparent;border-top:5px solid #2978ff}
+.layer h4,.gov h4{margin:0 0 9px;font:500 9.5px 'DM Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#52d9ff}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);font-weight:700;font-size:11.5px;color:#fff}
+.chip img{width:17px;height:17px}
+.chip.src{color:#b9c9de;font-weight:600}
+.gov{margin-top:20px;border:1px dashed rgba(82,217,255,.45);border-radius:14px;padding:11px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:rgba(82,217,255,.05)}
+.gov h4{flex-basis:100%;margin-bottom:3px}
+@media(max-height:820px){.js:not(.reduced) .seq-arch{scale:.86}}
+@media(max-width:1000px){.js:not(.reduced) .seq-arch{display:none}}

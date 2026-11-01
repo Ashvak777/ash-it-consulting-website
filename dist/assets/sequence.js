@@ -3,7 +3,7 @@
 (()=>{
 const sec=document.querySelector('[data-sequence]');if(!sec)return;
 const canvas=sec.querySelector('canvas'),ctx=canvas.getContext('2d');
-const steps=[...sec.querySelectorAll('[data-step]')],dots=[...sec.querySelectorAll('[data-dot]')],bar=sec.querySelector('.seq-progress i');
+const arch=sec.querySelector('.seq-arch'),steps=[...sec.querySelectorAll('[data-step]')],dots=[...sec.querySelectorAll('[data-dot]')],bar=sec.querySelector('.seq-progress i');
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const TAU=Math.PI*2,clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),mix=(a,b,t)=>a+(b-a)*t;
 const ss=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0));return t*t*(3-2*t)};
@@ -161,7 +161,7 @@ function frame(p,t){
     ctx.globalAlpha=1}
 
   // fade the world behind the captions
-  const wide=W>900;
+  const wide=W>900,archShown=arch&&arch.offsetParent!==null;
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='destination-out';
   const g=wide?ctx.createLinearGradient(R.x-110,0,R.x-6,0):ctx.createLinearGradient(0,R.y+R.h+4,0,R.y+R.h-40);
   g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;
@@ -174,7 +174,7 @@ function frame(p,t){
     const sx=(wide?W*(.3+cd.fx*.66):W*(.04+cd.fx*.78))+dx,sy=(wide?H*(.08+cd.fy*.82):H*(.05+cd.fy*.58))+dy;
     const k0=cwPx*cd.depth/200/c.s,dst=srcPos[i];
     const x=mix((sx-c.ox)/c.s,dst.x+100,a),y=mix((sy-c.oy)/c.s,dst.y+20,a),k=mix(k0,1,a),rot=mix(cd.rot,0,a);
-    const al=mix((.3+.6*cd.depth)*(wide?1:.45),1,a)*intro*(1-leave*.85);if(al<.01)return;
+    const al=mix((.3+.6*cd.depth)*(wide?1:.45),1,a)*intro*(1-leave*.85)*(archShown?ss(.03,.09,p):1);if(al<.01)return;
     ctx.save();ctx.globalAlpha=al;ctx.translate(x,y);ctx.rotate(rot);ctx.scale(k,k);srcCard(SRC[i]);ctx.restore()});
   ctx.globalAlpha=1;
 }
@@ -183,6 +183,7 @@ function setSteps(p){
   const a=[.1,.37,.64].reduce((n,x)=>p>=x?n+1:n,0);
   if(a!==shown){shown=a;steps.forEach((el,i)=>el.classList.toggle('on',i===a));dots.forEach((d,i)=>d.classList.toggle('on',i<=a))}
   if(bar)bar.style.transform=`scaleY(${p})`;
+  if(arch){const v=1-ss(.02,.08,p);arch.style.opacity=v;arch.style.transform=`scale(${.94+.06*v})`;arch.style.visibility=v<.01?'hidden':'visible'}
 }
 function target(){const r=sec.getBoundingClientRect(),len=r.height-innerHeight;return len>0?clamp(-r.top/len):0}
 function tick(t){if(!running)return;const tg=target();progress+=(tg-progress)*.22;if(Math.abs(tg-progress)<.0004)progress=tg;frame(progress,t);setSteps(progress);requestAnimationFrame(tick)}
